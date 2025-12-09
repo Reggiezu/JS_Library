@@ -1,13 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <style></style>
-</head>
-<body>
-    
-    <script src="main.js" ></script>
-</body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div>
+      <header>
+        <h1>Welcome to the library!</h1>
+        <h4>Here are the books that you checked out:</h4>
+        <button id="addBtn">Add new Book!</button>
+      </header>
+    </div>
+    <div id="BooksDisplay">
+      <div class="card" id="displayCard"></div>
+    </div>
+    <div id="modal">
+      <form id="newBookForm" style="display: none">
+        <span>Title:</span>
+        <input type="text" placeholder="The great gatsby" id="NBTitle" />
+        <span>Author:</span>
+        <input type="text" placeholder="Reggie Bush" id="NBAuthor" />
+        <span>Page Count:</span>
+        <input type="number" min="0" placeholder="545" id="NBPages" />
+        <p>Did you complete this book?</p>
+        <div>
+          <input type="radio" id="NBReadYes" name="readStatus" value="true" />
+          <label for="true">Complete</label><br />
+          <input
+            type="radio"
+            id="NBReadNo"
+            name="readStatus"
+            value="false"
+            checked
+          />
+          <label for="false">Incomplete</label>
+          <button type="submit" id="NBBtn">Submit</button>
+        </div>
+      </form>
+    </div>
+    <script src="main.js"></script>
+  </body>
 </html>
