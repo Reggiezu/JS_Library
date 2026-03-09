@@ -1,129 +1,173 @@
-//define variables
-let myLibrary = [];
-  const BooksDisplay = document.getElementById("displayCard")
-const Display =document.getElementById("BooksDisplay")
-const newBook = document.getElementById("addBtn")
-const NBTitle = document.getElementById("NBTitle")
-const newBookForm = document.getElementById("newBookForm")
-const NBAuthor = document.getElementById("NBAuthor")
-const NBBtn = document.getElementById("NBBtn")
-const NBPages = document.getElementById("NBPages")
-const NBReadYes = document.getElementById("NBReadYes")
-const NBReadNo = document.getElementById("NBReadNo")
+// ===== DOM refs =====
+const booksDisplay = document.getElementById("displayCard");
+const display = document.getElementById("BooksDisplay");
+const newBookBtn = document.getElementById("addBtn");
+const newBookForm = document.getElementById("newBookForm");
+
+const nbTitle = document.getElementById("NBTitle");
+const nbAuthor = document.getElementById("NBAuthor");
+const nbPages = document.getElementById("NBPages");
+const nbReadYes = document.getElementById("NBReadYes");
+const nbReadNo = document.getElementById("NBReadNo");
+const nbBtn = document.getElementById("NBBtn");
 
 
+// ===== Library module (IIFE) =====
+const Library = (function () {
+  let myLibrary = [];
 
-//open and close modal
-newBook.addEventListener("click",(e)=>{
-e.preventDefault();;
-newBookForm.style.display === 'none' ? newBookForm.style.display='block':newBookForm.style.display='none'
-})
+  function createBook(name, author, pages, read) {
+    const id = crypto.randomUUID();
 
-//add new book from form
-NBBtn.addEventListener("click",(e)=>{
-e.preventDefault();;
-
-const title = NBTitle.value;
-const author = NBAuthor.value;
-const pages = NBPages.value;
-const read = NBReadYes.checked === true ? true:false;
-console.log(read,author,pages,title)
-if(title !='' && author !='' && pages != '' ){
-addBookToLibrary(title,author,pages,read)
-displayLibrary();
-}else{
-alert("information is incomplete")
-return
-}
-})
-
-//New book constructor
-function Book(name, author,pages,read) {
-    this.id= crypto.randomUUID();
-    this.name = name;
-    this.author = author;
-    this.pages = pages;
-    this.sayID =() =>{
-        console.log(`My Id is ${this.id}`)
+    function sayID() {
+      console.log(`My Id is ${id}`);
     }
-   this.isRead = (read) =>
-  read === true ? "completed" : "Incomplete";
-Book.prototype.toggleRead = function () {
-  this.read = this.read === "completed" ? "Incomplete" : "completed";
-  displayLibrary();
-};
 
-console.log("READ VALUE:", read);
-this.read = this.isRead(read)
+    function isRead(readValue) {
+      return readValue === true ? "completed" : "Incomplete";
+    }
+
+    let readStatus = isRead(read);
+
+    function toggleRead() {
+      readStatus = readStatus === "completed" ? "Incomplete" : "completed";
+      return readStatus;
+    }
+
+    return {
+      id,
+      name,
+      author,
+      pages,
+      sayID,
+      toggleRead,
+      get read() {
+        return readStatus;
+      },
+    };
+  }
+
+  function addBook(name, author, pages, read) {
+    const book = createBook(name, author, pages, read);
+    myLibrary.push(book);
+    return book;
+  }
+
+  function getLibrary() {
+    return myLibrary;
+  }
+
+  function deleteBook(id) {
+    myLibrary = myLibrary.filter((book) => book.id !== id);
+    return myLibrary;
+  }
+
+  return {
+    createBook,
+    addBook,
+    getLibrary,
+    deleteBook,
+  };
+})();
+
+
+// ===== UI rendering =====
+function renderBookCard(book) {
+  const bookTitle = document.createElement("h4");
+  const author = document.createElement("p");
+  const pages = document.createElement("p");
+  const readStatus = document.createElement("p");
+  const card = document.createElement("div");
+  const contain = document.createElement("div");
+  const deleteBtn = document.createElement("button");
+
+  card.id = "displayCard";
+  card.className = "card";
+  contain.className = "container";
+  bookTitle.id = "bookname";
+  author.id = "author";
+
+  booksDisplay.appendChild(card);
+  card.appendChild(contain);
+  contain.appendChild(bookTitle);
+  contain.appendChild(author);
+  contain.appendChild(pages);
+  contain.appendChild(readStatus);
+  contain.appendChild(deleteBtn);
+
+  bookTitle.textContent = `${book.name}`;
+  author.textContent = `Author: ${book.author}`;
+  pages.textContent = `Page count: ${book.pages}`;
+  readStatus.innerHTML = `
+    Status: ${book.read}
+    <button class="readButton">Read</button>
+  `;
+
+  deleteBtn.textContent = "Delete";
+  deleteBtn.id = book.id;
+
+  const readBtn = readStatus.querySelector(".readButton");
+  readBtn.addEventListener("click", () => {
+    book.toggleRead();
+    displayLibrary();
+  });
+
+  deleteBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    handleDeleteBook(book.id);
+  });
+
+  display.appendChild(booksDisplay);
 }
 
-// Create new card element from the DOM
-const newCard =(book)=>{
-const bookTitle = document.createElement('h4')
-const Author = document.createElement('p')
-const pages = document.createElement('p')
-const readStatus = document.createElement('p')
-const Card = document.createElement("div")
-const contain = document.createElement("div")
-const DeleteBtn = document.createElement("button")
-Card.id = 'displayCard';
-Card.className='card';
-contain.className='container';
-bookTitle.id ='bookname'
-Author.id='author'
-
-BooksDisplay.appendChild(Card)
-Card.appendChild(contain)
-contain.appendChild(bookTitle)
-contain.appendChild(Author)
-contain.appendChild(pages)
-contain.appendChild(readStatus)
-contain.appendChild(DeleteBtn)
-
-
-
-bookTitle.textContent= ` ${book.name}`
-Author.textContent= `Author: ${book.author}`
-pages.textContent= `Page count: ${book.pages}`
-readStatus.innerHTML = `
-  Status: ${book.read}
-  <button class="readButton" data-id="${book}">Read</button>
-`;
-DeleteBtn.textContent="Delete";
-DeleteBtn.id =`${book.id}`
-const btn = readStatus.querySelector(".readButton");
-btn.addEventListener("click", () => book.toggleRead());
-
-DeleteBtn.addEventListener("click",(e)=>{
-e.preventDefault();
-id = book.id
-deleteBook(id);
-})
-Display.appendChild(BooksDisplay)
-
-}
-// delete function
-const deleteBook =(id)=>{
-myLibrary = myLibrary.filter(book => book.id !== id)
-displayLibrary();
-}
-//functon to display books
-const displayLibrary = () =>{
-BooksDisplay.innerHTML=""
-  myLibrary.forEach(book => {
-    newCard(book)
+function displayLibrary() {
+  booksDisplay.innerHTML = "";
+  Library.getLibrary().forEach((book) => {
+    renderBookCard(book);
   });
 }
-//add new books to library
-function addBookToLibrary(book,author,pages,read) {
-  // take params, create a book then store it in the array
-  const title = new Book(book,author,pages,read)
-  myLibrary.push(title);
+
+
+// ===== Controller / handlers =====
+function toggleBookForm(e) {
+  e.preventDefault();
+  newBookForm.style.display =
+    newBookForm.style.display === "none" ? "block" : "none";
 }
 
-addBookToLibrary('Halo','Mary Smith',55,false)
+function handleAddBook(e) {
+  e.preventDefault();
+
+  const title = nbTitle.value;
+  const author = nbAuthor.value;
+  const pages = nbPages.value;
+  const read = nbReadYes.checked === true ? true : false;
+
+  console.log(read, author, pages, title);
+
+  if (title !== "" && author !== "" && pages !== "") {
+    Library.addBook(title, author, pages, read);
+    displayLibrary();
+  } else {
+    alert("information is incomplete");
+    return;
+  }
+}
+
+function handleDeleteBook(id) {
+  Library.deleteBook(id);
+  displayLibrary();
+}
 
 
-addBookToLibrary('The Ref', 'Batista',345,true)
-console.log(myLibrary)
+// ===== Event listeners =====
+newBookBtn.addEventListener("click", toggleBookForm);
+nbBtn.addEventListener("click", handleAddBook);
+
+
+// ===== Initial seed data =====
+Library.addBook("Halo", "Mary Smith", 55, false);
+Library.addBook("The Ref", "Batista", 345, true);
+
+console.log(Library.getLibrary());
 displayLibrary();
