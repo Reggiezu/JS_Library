@@ -138,19 +138,23 @@ function toggleBookForm(e) {
 function handleAddBook(e) {
   e.preventDefault();
 
-  const title = nbTitle.value;
-  const author = nbAuthor.value;
-  const pages = nbPages.value;
-  const read = nbReadYes.checked === true ? true : false;
+  const newBook=[
+  { name:"Title", value: nbTitle.value },
+  { name:"Author", value: nbAuthor.value },
+  { name:"Pages", value: nbPages.value },
+  { name:"Read", value:nbReadYes.checked === true ? true : false }
+]
+  
+  const errorMsg = document.getElementById("error-msg");
+  console.log(newBook[3].value, newBook[1].value, newBook[2].value, newBook[0].value);
 
-  console.log(read, author, pages, title);
-
-  if (title !== "" && author !== "" && pages !== "") {
-    Library.addBook(title, author, pages, read);
-    displayLibrary();
+  if (newBook[0].value !== "" &&newBook[1].value !== "" && newBook[2].value !== "") {
+    console.log(newBook)
+    Library.addBook(newBook[0].value, newBook[1].value, newBook[2].value,newBook[3].value );
+   return displayLibrary();
   } else {
-    alert("information is incomplete");
-    return;
+    const error=newBook.find(data=> !data.value);
+   return  errorMsg.textContent=`${error.name} must be filled out`
   }
 }
 

@@ -17,3 +17,8 @@
   margin: 2px 16px;
   width: 150px;
 }
+.error{
+  color:red;
+  font-weight: bold;
+  font-style: italic;
+}
